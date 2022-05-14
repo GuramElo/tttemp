@@ -68,7 +68,7 @@ textarea {
 }
     </style>
 </head>
-<body onunload="onExit()">
+<body onunload="onExit()" onload="onStart()">
     <h1>Flashcards</h1>
     <button class="butt1">add question</button>
 <section style="display: none;" class="form1">
@@ -132,7 +132,7 @@ let currentCardBeingEdited=null;
 let generalObjectModels=new Array();
 let bigCardArray=new Array();
 let cardArray=new Array();
-let cardnum=this.localStorage.getItem("cardnum") === null ? 0 : this.localStorage.getItem("cardnum");
+let cardnum=this.localStorage.getItem("cardnum") === null ? 0 : Number(this.localStorage.getItem("cardnum"))+1;
 let cardModel = {
 qustion:(cardNo)=>document.querySelector(`#questCard${cardNo}`)?.innerText,
 answer:(cardNo)=>document.querySelector(`#questCard${cardNo}`)?.innerText
@@ -235,21 +235,100 @@ document.querySelector(".form1").style.display="block";
 
 function onExit(){
 let arr_pushed = new Array();
+let temp_arr = document.querySelectorAll(".wrapper > div");
+let maxa = 0;
+let id;
+let sumba = [];
+for(let i=0;i<temp_arr.length;i++){
+id = Number(temp_arr[i].getAttribute("id").substr((String(temp_arr[i].getAttribute("id")).indexOf('o')+1)));
+maxa = Math.max(id, maxa);
+let sub_arr = temp_arr[i].children;
 
-//localStorage.setItem("stuff",JSON.stringify(document.querySelector("body").innerHTML));
-
+arr_pushed.push({
+'id':id,
+'question':sub_arr[0].innerText,
+'answer':sub_arr[1].innerText,
+'x-off':window.getComputedStyle(temp_arr[i]).left,
+'y-off':window.getComputedStyle(temp_arr[i]).top,
+'position':window.getComputedStyle(temp_arr[i]).position
+});
 
 }
+
+
+localStorage.setItem("cardnum", maxa);
+localStorage.setItem("main", JSON.stringify(arr_pushed));
+}
 function onStart(){
-/*let tempi0 = localStorage.getItem("stuff");
-generalObjectModels = !!tempi0 ? JSON.parse(tempi0) : new Array();
+let storage_arr = JSON.parse(localStorage.getItem("main"));
+for(let i of storage_arr){
+//==============================================================================
+let cardnum = i.id;
+let tag = document.createElement("div");
+tag.setAttribute("draggable",true);
+tag.style.position = i.position;
 
-let tempi = localStorage.getItem("boolArr");
-bigCardArray = !!tempi ? JSON.parse(tempi) : new Array();
+tag.setAttribute("ondragstart",`dragStart(event,"${cardnum}")`);
+tag.setAttribute("ondragend",`dragEnd(event,"${cardnum}")`);
 
-let tempi2 = localStorage.getItem("cardnum");
-cardnum = !!tempi2 ? JSON.parse(tempi2) : 0;
-*/
+tag.setAttribute("id",`cardno${cardnum}`);
+let temp=document.createElement("span");
+temp.setAttribute("id",`questCard${cardnum}`)
+temp.innerText=i.question;
+tag.appendChild(temp);
+
+
+let tag2 = document.createElement("span");
+tag2.appendChild(document.createTextNode(i.answer));
+tag2.setAttribute("id",`card-answer${cardnum}`);
+tag2.style.display="none";
+tag.appendChild(tag2);
+
+
+let tag1 = document.createElement("span");
+tag1.setAttribute("id",`anchor${cardnum}`);
+tag1.innerText = "show/hide answer";
+tag1.style.cursor = "pointer";
+tag1.setAttribute('onclick',`showHideAnswer("${cardnum}")`);
+tag.appendChild(tag1);
+
+
+let button1 = document.createElement("button");
+button1.setAttribute("type","button");
+button1.innerText="delete";
+button1.setAttribute("onclick",`deleteCard("${cardnum}")`);
+tag.appendChild(button1);
+
+let button2 = document.createElement("button");
+button2.setAttribute("type","button");
+button2.innerText="edit";
+button2.setAttribute("onclick",`editCard("${cardnum}")`);
+tag.appendChild(button2);
+
+
+
+document.querySelector(".wrapper").appendChild(tag);
+
+if(i.position == 'absolute'){
+    console.log(document.querySelector(".wrapper").lastChild);
+    document.querySelector(".wrapper").lastChild.style.left = i['x-off'];
+    document.querySelector(".wrapper").lastChild.style.top = i['y-off'];
+}
+
+
+
+
+
+
+
+
+//==============================================================================
+}
+
+
+
+
+
 }
 /*
 setInterval(()=>{
