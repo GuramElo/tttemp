@@ -5,12 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
+        button {
+            width:100px;
+            height:35px;
+            background-color: rgb(2, 2, 255);
+            border: 1px white solid;
+            border-radius: 8px;
+        }
         span {
             display: block;
-            font-size: large;
+            font-weight: bold;
             letter-spacing: 2px;
-            max-width: 40vw;
-            margin: 15px;
+            max-width: 100%;
+            padding: 15px 15px 15px 0;
+            -webkit-user-select: none;
+            -moz-user-select: none;   
+            -ms-user-select: none;    
+            user-select: none;
+            box-sizing: content-box;
         }
         body {
             margin: 0;
@@ -31,16 +43,20 @@
     display: flex;
     flex-wrap: wrap;
     background-color: red;
+    height:80%;
+    position:relative;
 }
 .wrapper > div {
     display:flex;
     flex-wrap: wrap;
-    width:33vw;
-    min-height:20vh;
+    width:33%;
+    height:min-content;
     background-color: orangered;
     border: 1px solid blue;
+    max-height: fit-content;
+box-sizing: content-box;
 }
-.wrappet > div > div {
+.wrapper > div > div {
     display: flex;
     flex-wrap: wrap;
     width:100%;
@@ -52,7 +68,7 @@ textarea {
 }
     </style>
 </head>
-<body>
+<body onunload="onExit()">
     <h1>Flashcards</h1>
     <button class="butt1">add question</button>
 <section style="display: none;" class="form1">
@@ -102,7 +118,7 @@ textarea {
 
 
 
-<div class="wrapper">
+<div class="wrapper" dropzone="true">
 
 </div>
 
@@ -113,18 +129,26 @@ textarea {
 
 <script>
 let currentCardBeingEdited=null;
-let generalObjectModel=new Array();
+let generalObjectModels=new Array();
 let bigCardArray=new Array();
 let cardArray=new Array();
 let cardnum=this.localStorage.getItem("cardnum") === null ? 0 : this.localStorage.getItem("cardnum");
-
+let cardModel = {
+qustion:(cardNo)=>document.querySelector(`#questCard${cardNo}`)?.innerText,
+answer:(cardNo)=>document.querySelector(`#questCard${cardNo}`)?.innerText
+}
 
 document.querySelector("section > .submit").addEventListener("click",()=>{
-    console.log("summonned");
+    
 bigCardArray[Number(cardnum)]=true;
 cardArray[Number(cardnum)]=true;
 
 let tag = document.createElement("div");
+tag.setAttribute("draggable",true);
+
+tag.setAttribute("ondragstart",`dragStart(event,"${cardnum}")`);
+tag.setAttribute("ondragend",`dragEnd(event,"${cardnum}")`);
+
 tag.setAttribute("id",`cardno${cardnum}`);
 let temp=document.createElement("span");
 temp.setAttribute("id",`questCard${cardnum}`)
@@ -170,7 +194,7 @@ document.querySelector(".form1").style.display="none";
 function showHideAnswer(cardnomeri){
 document.getElementById(`card-answer${Number(cardnomeri)}`).style.display=Boolean(cardArray[Number(cardnomeri)]) ? 'inline-block' : 'none';
 cardArray[Number(cardnomeri)]=!cardArray[Number(cardnomeri)];
-console.log("summonned hide" + cardnomeri);
+
 }
 
 
@@ -207,6 +231,49 @@ function onEdit(){
 document.querySelector(".butt1").addEventListener("click",()=>{
 document.querySelector(".form1").style.display="block";
 })
+
+
+function onExit(){
+let arr_pushed = new Array();
+
+//localStorage.setItem("stuff",JSON.stringify(document.querySelector("body").innerHTML));
+
+
+}
+function onStart(){
+/*let tempi0 = localStorage.getItem("stuff");
+generalObjectModels = !!tempi0 ? JSON.parse(tempi0) : new Array();
+
+let tempi = localStorage.getItem("boolArr");
+bigCardArray = !!tempi ? JSON.parse(tempi) : new Array();
+
+let tempi2 = localStorage.getItem("cardnum");
+cardnum = !!tempi2 ? JSON.parse(tempi2) : 0;
+*/
+}
+/*
+setInterval(()=>{
+onExit();
+},10000);
+*/
+let init_left,init_top,cursor_left,cursor_top;
+function dragStart(event, cardnomeri){
+    event.target.style.opacity=0.01;
+    init_left=event.target.offsetLeft;
+    init_top=event.target.offsetTop;
+    cursor_left=event.clientX;
+    cursor_top=event.clientY;
+}
+
+function dragEnd(event, cardnomeri){
+    event.target.style.opacity = 1;
+let yArr = 0, xArr = 0;
+xArr = event.clientX - cursor_left;
+yArr = event.clientY - cursor_top;
+event.target.style.position = "absolute";
+event.target.style.left = init_left + xArr + "px";
+event.target.style.top = init_top + yArr + "px"; 
+}
 </script>
 
 
