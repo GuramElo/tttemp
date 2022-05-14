@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        span {
+            display: block;
+            font-size: large;
+            letter-spacing: 2px;
+            max-width: 40vw;
+            margin: 15px;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        html, body{
+            width:100%;
+            height:100%;
+        }
+        section {
+           /* display: none;*/
+            background-color: green;
+            border: 2px solid black;
+            width:40vw;
+            height:30vh;
+        }
+.wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: red;
+}
+.wrapper > div {
+    display:flex;
+    flex-wrap: wrap;
+    width:33vw;
+    min-height:20vh;
+    background-color: orangered;
+    border: 1px solid blue;
+}
+.wrappet > div > div {
+    display: flex;
+    flex-wrap: wrap;
+    width:100%;
+height:100%;
+}
+textarea {
+    width:60%;
+    height:30%;
+}
+    </style>
+</head>
+<body>
+    <h1>Flashcards</h1>
+    <button class="butt1">add question</button>
+<section style="display: none;" class="form1">
+    <div>
+<label for="question">Question</label>
+<textarea id="question"></textarea>
+</div>
+
+<div>
+    
+<label for="answer">asnwer</label>
+<textarea id="answer"></textarea>
+</div>
+
+<button type="button" class="submit">Save</button>
+
+</section>
+
+<!---->
+<section style="background-color: palegoldenrod; display: none;" class="form2">
+    <div>
+<label for="question-edit">Question</label>
+<textarea id="question-edit"></textarea>
+</div>
+
+<div>
+    
+<label for="answer-edit">answer</label>
+<textarea id="answer-edit"></textarea>
+</div>
+
+<button type="button" class="submit-edit" onclick="onEdit()">edit</button>
+
+</section>
+
+
+<!---->
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="wrapper">
+
+</div>
+
+
+
+
+
+
+<script>
+let currentCardBeingEdited=null;
+let generalObjectModel=new Array();
+let bigCardArray=new Array();
+let cardArray=new Array();
+let cardnum=this.localStorage.getItem("cardnum") === null ? 0 : this.localStorage.getItem("cardnum");
+
+
+document.querySelector("section > .submit").addEventListener("click",()=>{
+    console.log("summonned");
+bigCardArray[Number(cardnum)]=true;
+cardArray[Number(cardnum)]=true;
+
+let tag = document.createElement("div");
+tag.setAttribute("id",`cardno${cardnum}`);
+let temp=document.createElement("span");
+temp.setAttribute("id",`questCard${cardnum}`)
+temp.innerText=document.getElementById("question").value;
+tag.appendChild(temp);
+
+
+let tag2 = document.createElement("span");
+tag2.appendChild(document.createTextNode(document.getElementById("answer").value));
+tag2.setAttribute("id",`card-answer${cardnum}`);
+tag2.style.display="none";
+tag.appendChild(tag2);
+
+
+let tag1 = document.createElement("span");
+tag1.setAttribute("id",`anchor${cardnum}`);
+tag1.innerText = "show/hide answer";
+tag1.style.cursor = "pointer";
+tag1.setAttribute('onclick',`showHideAnswer("${cardnum}")`);
+tag.appendChild(tag1);
+
+
+let button1 = document.createElement("button");
+button1.setAttribute("type","button");
+button1.innerText="delete";
+button1.setAttribute("onclick",`deleteCard("${cardnum}")`);
+tag.appendChild(button1);
+
+let button2 = document.createElement("button");
+button2.setAttribute("type","button");
+button2.innerText="edit";
+button2.setAttribute("onclick",`editCard("${cardnum}")`);
+tag.appendChild(button2);
+
+
+
+document.querySelector(".wrapper").appendChild(tag);
+cardnum++;
+document.querySelector(".form1").style.display="none";
+});
+    
+//methods
+function showHideAnswer(cardnomeri){
+document.getElementById(`card-answer${Number(cardnomeri)}`).style.display=Boolean(cardArray[Number(cardnomeri)]) ? 'inline-block' : 'none';
+cardArray[Number(cardnomeri)]=!cardArray[Number(cardnomeri)];
+console.log("summonned hide" + cardnomeri);
+}
+
+
+
+function deleteCard(cardnomeri){
+let elem=document.getElementById(`cardno${cardnomeri}`);
+elem.parentNode.removeChild(elem);
+bigCardArray[Number(cardnomeri)]=false;
+}
+
+
+
+function editCard(cardnomeri){
+    document.querySelector(".form2").style.display = "block";
+    
+    document.querySelector("#question-edit").value = document.querySelector(`#questCard${cardnomeri}`).innerText;
+    
+    document.querySelector("#answer-edit").value = document.querySelector(`#card-answer${cardnomeri}`).innerText;
+    
+    currentCardBeingEdited = cardnomeri;
+}
+
+function onEdit(){
+
+    document.querySelector(`#card-answer${currentCardBeingEdited}`).innerText = document.querySelector("#answer-edit").value;
+
+    document.querySelector(`#questCard${currentCardBeingEdited}`).innerText = document.querySelector("#question-edit").value;
+    
+    document.querySelector(".form2").style.display = "none";
+
+    currentCardBeingEdited = null;
+}
+//garbage
+document.querySelector(".butt1").addEventListener("click",()=>{
+document.querySelector(".form1").style.display="block";
+})
+</script>
+
+
+
+</body>
+</html>
